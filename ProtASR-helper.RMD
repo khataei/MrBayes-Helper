@@ -1,0 +1,24 @@
+---
+title: "ProtASR-Helper"
+author: "Javad Khataei"
+date: "March 20, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# ProtASR Helper  
+This file read ProtASR2.2 output and analysis the data. It find the aminoacids with the highest probability for each node. If the probability is less than 0.8, it will be market for further analysis.
+
+
+### Load libraries and read files
+```{r load libraries}
+library(tidyverse)
+library(data.table)
+
+file_name <- "ProtASR-sample-output.txt"
+df <- fread(file_name)
+```
+
