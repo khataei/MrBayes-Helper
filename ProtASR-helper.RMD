@@ -17,8 +17,41 @@ This file read ProtASR2.2 output and analysis the data. It find the aminoacids w
 ```{r load libraries}
 library(tidyverse)
 library(data.table)
+library(stringr)
 
+```
+
+
+```{r read-files}
 file_name <- "ProtASR-sample-output.txt"
-df <- fread(file_name)
+raw_lines <- readr::read_lines(file = file_name, skip_empty_rows = TRUE)
+df <- data_frame(raw_lines)
+```
+
+### Which nodes?
+The output file has a line similar to this, `Nodes 75 to 147 are ancestral`, which indicates which nodes to expect. 
+
+```{r node-range}
+first_word <-
+    df$raw_lines[1:50] %>% stringr::str_split(n = 2, pattern = " ")
+
+
+for (i in 1:50) {
+    if (first_word[[i]][1] == "Nodes") {
+        print(df$raw_lines[i])
+        first_node_number <-
+        stringr::str_split(string = raw_lines[i], pattern = " ")[[1]][2] %>%  
+            as.numeric()
+        last_node_number <-
+        stringr::str_split(string = raw_lines[i], pattern = " ")[[1]][4] %>%  
+            as.numeric()
+        
+    }
+}
+```
+
+
+```{r }
+
 ```
 
