@@ -51,7 +51,42 @@ for (i in 1:50) {
 ```
 
 
-```{r }
+```{r to-dataframe}
+# the plan was using one space(" ") as split pattern to convert the line to a series of colums but the number of  spaces changes in lines. The "site" increase and that reduces the spaces so can't use space to split.
+# that why the following lines are commented out
+# words_in_line <- df$raw_lines %>%
+#     stringr::str_split_fixed(n= 40, pattern = " ") %>% 
+#     as_tibble()
+# 
+# # Column V5 has the node number and a comma. delete the comma
+# words_in_line$V5 <- words_in_line$V5 %>%
+#     stringr::str_remove_all(",") 
+
+# Trim the dat frame and select useful columns
+#working_df <- words_in_line %>% select(c(V5, V16:V38))
+
+# How to solve it?
+# Split by :. Note there is a : in lines
+words_in_line <- df$raw_lines %>%
+    stringr::str_split_fixed(n= 2, pattern = ":") %>%
+    as_data_frame()
+
+# now use space to split and select the last solumn
+# V5 has the node number and V14 the  letters
+working_df <- words_in_line$V1 %>%
+    stringr::str_split_fixed(n= 14, pattern = " ") %>%
+    as_tibble() %>% 
+    select(V5, V14)
+# Node numbers have a comma
+ working_df$V5 <- working_df$V5 %>%
+    stringr::str_remove_all(",")
+# Combine with the half after :
+working_df <- cbind(working_df,words_in_line$V2)
 
 ```
+
+
+### Clean dataset
+Now that we have the important data in a dataframe, we need to clean the dataset.
+
 
