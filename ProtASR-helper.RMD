@@ -89,4 +89,55 @@ working_df <- cbind(working_df,words_in_line$V2)
 ### Clean dataset
 Now that we have the important data in a dataframe, we need to clean the dataset.
 
+# Important
+Define the number of sites in this chunk first 
+
+```{r}
+site_number <- 217
+```
+
+```{r trim}
+# Which row has the first node number in it? delete above it
+first_row_index <- which.max(working_df$V5 == first_node_number)
+
+# Last important row
+last_row_index <- (site_number + 2) * (last_node_number - first_node_number + 1) + first_row_index
+
+working_df <- working_df %>% slice(first_row_index:(last_row_index-1))
+
+# Rename columns
+colnames(working_df) <- c("node","letters","probs")
+
+# Create site numbers
+working_df$node <- rep(first_node_number:last_node_number, each= site_number + 2)
+
+# Remove empty rows
+working_df <- working_df %>%  dplyr::filter(working_df$letters != "") 
+```
+
+
+### Extract probabilities
+
+All probabilities are in one column. First we create several columns from the prob column by splitting by space. Then name each column based on their aminoacids. Then split each by ( or even string index. Add a site number for each row. Then convert the data set from a fat dataset to a long one. At the end the data set will have these columns
+
+|Node   |Letters    |Site    |Amino   |Prob   |
+|-------|-----------|--------|--------|-------|
+|75     |MMMM       |1       |M       |1.000  |
+|75     |MMMM       |1       |R       |0.000  |
+
+
+
+
+```{r extract-probs}
+
+```
+
+
+### Flag possible gaps or high probabilities
+
+Focus on Prob column. Group by Site and then for each site order by prob and then add the first two one. If the sum is less than 0.8 then create a column and call it Alert. Else create the flag column and leave it empty.
+
+
+
+
 
