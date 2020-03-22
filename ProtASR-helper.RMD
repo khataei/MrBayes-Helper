@@ -174,10 +174,9 @@ for (i in 1:nrow(working_df)) {
 
  gathered_df <- rbind(gathered_df, temp_df)
  if (i %% 1000 == 0){
-     print(paste0(i , "rows out of ",nrow(working_df) ," are done!"))
+     print(paste0(i , " rows out of ",nrow(working_df) ," are done!"))
  }
 }
-
 
 ```
 
