@@ -14,7 +14,7 @@ This file read ProtASR2.2 output and analysis the data. It find the aminoacids w
 
 
 ### Load libraries and read files
-```{r load libraries}
+```{r load libraries, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(data.table)
 library(stringr)
@@ -51,7 +51,7 @@ for (i in 1:50) {
 ```
 
 
-```{r to-dataframe}
+```{r to-dataframe, warning=FALSE}
 # the plan was using one space(" ") as split pattern to convert the line to a series of colums but the number of  spaces changes in lines. The "site" increase and that reduces the spaces so can't use space to split.
 # that why the following lines are commented out
 # words_in_line <- df$raw_lines %>%
@@ -126,9 +126,58 @@ All probabilities are in one column. First we create several columns from the pr
 |75     |MMMM       |1       |R       |0.000  |
 
 
-
+### Prepare probabilities
 
 ```{r extract-probs}
+# Separate probs by space
+probs_df <- working_df$probs %>%
+    stringr::str_split_fixed(n = 21, pattern = " ") %>%
+    as_data_frame()
+
+# The first column is empty!
+probs_df <- probs_df %>% select(-V1) 
+
+
+probs_df <- probs_df %>%
+    mutate_all(function(x) stringr::str_sub(string =x, start = 3,end = 7))
+
+# Put everything in a single dataframe
+working_df <- cbind(select(working_df, node, letters), probs_df)
+
+
+# Rename amino acid columns
+amino_names <- c("A","R","N","D","C","Q","E","G",
+                  "H","I","L","K","M","F","P","S",
+                  "T","W","Y","V")
+
+colnames(working_df) <- c("node","letters",amino_names)
+
+```
+
+### Gather the date from columns to rows
+```{r}
+# First add site number to each row
+times <- last_node_number - first_node_number + 1
+working_df$site <- rep(1:site_number, times = times)
+
+# loop through all rows and for each row convert the columns
+# into rows and bind the results
+
+# an empty to store the results
+gathered_df <- matrix(nrow = 0, ncol = 5) %>%  as.data.frame()
+colnames(gathered_df) <- c("node", "letters", "aminoacid", "probability", "site")
+
+
+for (i in 1:nrow(working_df)) {
+ temp_df <- gather(working_df[i,], - node, -site, -letters,
+                     key = "aminoacid", value = "probability") 
+
+ gathered_df <- rbind(gathered_df, temp_df)
+ if (i %% 1000 == 0){
+     print(paste0(i , "rows out of ",nrow(working_df) ," are done!"))
+ }
+}
+
 
 ```
 
