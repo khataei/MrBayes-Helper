@@ -18,6 +18,7 @@ This file read ProtASR2.2 output and analysis the data. It find the aminoacids w
 library(tidyverse)
 library(data.table)
 library(stringr)
+#library(Rfast)
 
 ```
 
@@ -155,7 +156,7 @@ colnames(working_df) <- c("node","letters",amino_names)
 ```
 
 ### Gather the date from columns to rows
-```{r}
+```{r gather}
 # First add site number to each row
 times <- last_node_number - first_node_number + 1
 working_df$site <- rep(1:site_number, times = times)
@@ -186,6 +187,76 @@ for (i in 1:nrow(working_df)) {
 Focus on Prob column. Group by Site and then for each site order by prob and then add the first two one. If the sum is less than 0.8 then create a column and call it Alert. Else create the flag column and leave it empty.
 
 
+```{r flag-dashed}
+gathered_df$dashed <- ""
 
+
+gathered_df <- gathered_df %>% mutate(dashed = ifelse(stringr::str_detect(gathered_df$letters, "-"), "Has dash",""))
+
+data.table::fwrite(x = gathered_df, "gathered_df.csv")
+```
+
+
+```{r flag-prob}
+
+working_df <- gathered_df
+
+
+working_df$probability<- working_df$probability %>%  as.numeric()
+# this function calculations the sum of nth biggest elements
+sum_nth <- function(x, n = 3, col_numb = 1){
+    len <- NROW(x)
+    x <- x %>% as_data_frame()
+    x <- x[,col_numb]
+    colnames(x) <- "V1"
+    x <- x[order(x$V1),]
+    x %>%  tail(n) %>%  sum()
+}
+
+which_nth <- function(x, n = 3, col_numb = 1){
+    len <- NROW(x)
+    x <- x %>% as_data_frame()
+    x <- x[,col_numb]
+    colnames(x) <- "V1"
+    x$row_number <- 1:len
+    x <- x[order(x$V1),]
+    x <- x %>%  tail(n) %>%  select(row_number)
+    return(x$row_number)
+}
+
+
+working_df <- working_df %>% group_by(node, site) %>% 
+    mutate(
+        selected_amino_acid = 
+           ifelse(sum_nth(probability, n =1)> 0.8, 
+                  paste0(working_df[which_nth(probability, n=1),'aminoacid']) ,
+                  
+                  ( # this is the else part of the first if
+                      ifelse(sum_nth(probability, n =2)> 0.8, 
+                  str_c(working_df[which_nth(probability, n=2),'aminoacid'], collapse = "/"),
+                  
+                  
+                  (# this is the else part of the second if
+                      
+                      ifelse(sum_nth(probability, n =3)> 0.8, 
+                  str_c(working_df[which_nth(probability, n=3),'aminoacid'], collapse = "/"),
+                  
+                  # this is the else of the last if
+                  "gap"
+                  
+                  )
+                      
+                  )
+                  
+                  
+                  )
+                  )
+                  ))
+
+
+
+data.table::fwrite(x = working_df, "final_df.csv")
+
+```
 
 
