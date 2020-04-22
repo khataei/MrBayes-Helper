@@ -12,4 +12,10 @@ Try it here:
 1- Download the [sample file](https://raw.githubusercontent.com/khataei/MrBayes-Helper/master/asr_a3f_newworldmonkeys_gtr_outgroup_tree.pstat)
 
 
-https://seyedjavad.shinyapps.io/MrBayes-Helper/
+2- Go to https://seyedjavad.shinyapps.io/MrBayes-Helper/
+
+3- Enter `newworldmonkeys` in the species-name box
+
+4- Upload the file
+
+5- Create the log file and result file
