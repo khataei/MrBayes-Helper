@@ -9,7 +9,7 @@ In this repository I prepared an R code which get a *pstat* file and returns two
 
 
 Try it here:  
-1- Download this sample [file] (https://raw.githubusercontent.com/khataei/MrBayes-Helper/master/asr_a3f_newworldmonkeys_gtr_outgroup_tree.pstat)
+1- Download this sample [file] <https://raw.githubusercontent.com/khataei/MrBayes-Helper/master/asr_a3f_newworldmonkeys_gtr_outgroup_tree.pstat>
 
 
 https://seyedjavad.shinyapps.io/MrBayes-Helper/
